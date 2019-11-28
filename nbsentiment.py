@@ -1,15 +1,16 @@
 #Code adapted from https://towardsdatascience.com/machine-learning-text-processing-1d5a2d638958
 
+from math import sqrt
 import pandas as pd
 import numpy as np
 import nltk
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize, sent_tokenize
+from nltk.corpus import stopwords 
+from nltk.tokenize import word_tokenize, sent_tokenize 
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score
-from sklearn.metrics import f1_score
+from sklearn.metrics import confusion_matrix
 
 def remove_pun(element):
     import string
@@ -30,10 +31,6 @@ def main():
 
     #Prepare model data
     model_data = pd.DataFrame({"MaxTrait":data["MaxTrait"],"text": data["text"], "sentiment":sentiment})
-    model_data.head()
-
-
-
     model_data["text"] = model_data["text"].apply(remove_pun)
     model_data["text"] = model_data["text"].apply(remove_stopwords)
 
@@ -62,7 +59,13 @@ def main():
     predicted = nb.predict(test_vectors)
     #Use array to store all data
     accuracy = np.array(accuracy_score(y_test, predicted))
-    f1 = np.array(f1_score(y_test, predicted))
+    cm = confusion_matrix(y_test, predicted)
+    if cm.shape[0] == 2:
+        measure = sqrt((cm[0,0]/(cm[0,0]+cm[1,0]))*(cm[1,1]/(cm[0,1]+cm[1,1])))
+    else:
+        measure = 0
+    g_mean = np.array(measure)
+
 
     for element in np.unique(model_data["MaxTrait"]):
         model_subset = model_data[model_data["MaxTrait"] == element]
@@ -91,11 +94,15 @@ def main():
         predicted = nb.predict(test_vectors)
         #Use array to store all data
         accuracy = np.append(accuracy, np.array(accuracy_score(y_test, predicted)))
-        f1 = np.append(f1, np.array(f1_score(y_test, predicted)))
-
+        cm = confusion_matrix(y_test, predicted)
+        if cm.shape != (2,2):
+            measure = 0
+        else:
+            measure = sqrt((cm[0,0]/(cm[0,0]+cm[1,0]))*(cm[1,1]/(cm[0,1]+cm[1,1])))
+        g_mean = np.append(g_mean, np.array(measure))
     #outputing nb result
     category = np.append("All", np.unique(model_data["MaxTrait"]))
-    output = pd.DataFrame({"Category":category, "accuracy":accuracy, "f1":f1})
+    output = pd.DataFrame({"Category":category, "accuracy":accuracy, "g_mean":g_mean})
     output.to_csv("nboutput.csv", index = False)
 
 if __name__ == '__main__':
