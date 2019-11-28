@@ -1,3 +1,6 @@
+#Adapted from https://towardsdatascience.com/machine-learning-word-embedding-sentiment-classification-using-keras-b83c28087456
+#Multivarite implementation from https://machinelearningmastery.com/multivariate-time-series-forecasting-lstms-keras/
+
 from math import sqrt
 import pandas as pd
 import numpy as np
