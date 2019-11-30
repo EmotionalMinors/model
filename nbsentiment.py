@@ -24,7 +24,7 @@ def remove_stopwords(element):
 
 def main():
     #Need changing data source
-    data = pd.read_csv("sub.csv")
+    data = pd.read_csv("newcleanset.csv")
     data.head()
     sentiment = data["rating"] >3
     sentiment = sentiment.astype(int)
