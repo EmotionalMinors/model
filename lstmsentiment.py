@@ -51,7 +51,7 @@ def main():
 	x = tokenizer.texts_to_sequences(model_data["text"].values)
 	x = pad_sequences(x)
 	y = pd.get_dummies(model_data["sentiment"]).values
-	x_train, x_test, y_train, y_test = train_test_split(x, y,train_size = 0.8, random_state = 13)
+	x_train, x_test, y_train, y_test = train_test_split(x, y,train_size = 0.8)
 	#Build LSTM model
 	embed_dim = 150
 	lstm_out = 200
